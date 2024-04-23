@@ -1,14 +1,17 @@
+import {nextui} from '@nextui-org/theme';
 import type { Config } from "tailwindcss"
 import { withUt } from "uploadthing/tw";
 
 export default withUt({
   darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
-	],
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+    "./node_modules/@nextui-org/theme/dist/components/(button|progress|ripple|spinner).js"
+  ].js"
+  ],
   prefix: "",
   theme: {
     container: {
@@ -75,7 +78,7 @@ export default withUt({
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require(tailwindcss-animate),nextui()],
 } satisfies Config);
 
 // export default config
