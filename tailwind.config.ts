@@ -9,7 +9,7 @@ export default withUt({
     "./components/**/*.{ts,tsx}",
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
-    "./node_modules/@nextui-org/theme/dist/components/(button|progress|ripple|spinner).js"
+    "./node_modules/@nextui-org/theme/dist/components/(button|progress|radio|ripple|spinner).js"
   ],
   prefix: "",
   theme: {
