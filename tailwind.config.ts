@@ -10,7 +10,6 @@ export default withUt({
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
     "./node_modules/@nextui-org/theme/dist/components/(button|progress|ripple|spinner).js"
-  ].js"
   ],
   prefix: "",
   theme: {
@@ -78,7 +77,7 @@ export default withUt({
       },
     },
   },
-  plugins: [require(tailwindcss-animate),nextui()],
+  plugins: [require("tailwindcss-animate"),nextui()],
 } satisfies Config);
 
 // export default config
