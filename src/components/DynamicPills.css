@@ -83,3 +83,8 @@
   min-height: 2.5rem;
 }
 
+.pill-widget:focus-visible, 
+.pill-widget:focus-within, 
+.pill-widget:focus {
+  box-shadow: 0 0 0 2px white, 0 0 0 4px black;
+}
