@@ -1,18 +1,26 @@
 "use client";
 
 import Image from "next/image";
+import React, { useState, useReducer, useRef } from "react";
+
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-// import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { RadioGroup, Radio } from "@nextui-org/radio";
-import { Button } from "@nextui-org/button";
 import { Button as ShadButton } from "@/components/ui/button";
-import { Progress } from "@nextui-org/progress";
+
+import { ReloadIcon, UserIcon } from "@/components/HeroIcons";
 import DynamicPillInput, { PillInterface } from "@/components/DynamicPills";
-import { cn } from "@/lib/utils";
+
+import { Button } from "@nextui-org/button";
+import { Progress } from "@nextui-org/progress";
+import { RadioGroup, Radio } from "@nextui-org/radio";
+// import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+// import { ReloadIcon } from "@radix-ui/react-icons"
 import { ChangeEvent, FormEvent } from "react";
-import React, { useState, useReducer } from "react";
+
+import { cn, isEmptyOrNull } from "@/lib/utils";
+import { useUploadThing } from "@/utils/uploadthing";
+import { db, StudentInterface } from "@/lib/db";
 
 type Action = {
   type: string;
@@ -20,7 +28,7 @@ type Action = {
   newName?: string;
   newEmail?: string;
   newWebsite?: string;
-  newImage?: string;
+  newImage?: File;
   // newImage?: File;
   newGender?: string;
   newSkills?: PillInterface[];
@@ -30,7 +38,7 @@ type State = {
   name: string;
   email: string;
   website?: string;
-  image?: string;
+  image?: File;
   // image?: File;
   gender: string;
   skills?: PillInterface[];
@@ -40,10 +48,16 @@ const initialFormState = {
   name: "",
   email: "",
   website: "",
-  image: "",
+  image: undefined,
   // image: undefined,
   gender: "",
   skills: [],
+};
+
+type ResponseTicket = {
+  // https://docs.uploadthing.com/api-reference/react
+  fileKey: string;
+  fileUrl: string;
 };
 
 function reducer(state: State, action: Action) {
@@ -68,22 +82,52 @@ function reducer(state: State, action: Action) {
 function RegistrationForm(props: { className?: string }) {
   // const [gender, setGender] = useState<string>("");
   const [formState, dispatch] = useReducer(reducer, initialFormState);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const uploadButton = useRef<HTMLInputElement>(null);
+  const { startUpload, isUploading, permittedFileInfo } = useUploadThing(
+    "imageUploader",
+    {
+      onUploadBegin: () => {
+        setIsProcessing(true);
+        // alert("upload has begun");
+      },
+      onClientUploadComplete: (res) => {
+        submitToDb(formState, res[0].url);
+        setIsProcessing(false);
+        /* Info: res.fileUrl returns undefine */
+        console.log(res, res[0].url);
+        // alert("uploaded successfully!");
+      },
+      onUploadError: () => {
+        setIsProcessing(false);
+        alert("Error occurred while uploading image.");
+      },
+    },
+  );
+
+  const submitToDb = (formState: State, imageUrl: string = "") => {
+    const data: StudentInterface = {
+      name: formState.name,
+      email: formState.email,
+      website: formState.website ?? "",
+      // image_link: "" /* Todo: useUploadThing() */,
+      image_link: imageUrl,
+      gender: formState.gender as "M" | "F",
+      skills: formState.skills?.map((pill) => pill.text) ?? [],
+    };
+    db.students.add(data);
+    console.log(data);
+  };
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    const form = new FormData();
-    
-    form.append('param-one', 'value-one');
-    form.append('name', formState.name);
-    form.append('email', formState.email);
-    form.append('website', formState.website ?? '');
-    form.append('image', formState.image ?? '');
-    form.append('gender', formState.gender);
-    form.append('skills', JSON.stringify(formState.skills));
-
-    console.log(`Form created:`, JSON.stringify(Array.from(form.entries())));
-    // console.log(formState.name, formState.gender, formState.image);
-    // console.log(`Form submitted:`, e);
+    if (formState.image != undefined) 
+      startUpload([formState.image]);
+    else {
+      setIsProcessing(true);
+      submitToDb(formState,"");
+      setIsProcessing(false);
+    }
   }
 
   function clearFields(e: React.MouseEvent<HTMLButtonElement>) {
@@ -93,16 +137,25 @@ function RegistrationForm(props: { className?: string }) {
       newName: "",
       newEmail: "",
       newWebsite: "",
-      newImage: "",
+      newImage: undefined,
       newGender: "",
       newSkills: [],
     });
+    if (uploadButton.current) uploadButton.current.value = "";
   }
 
   const isInvalidGender = (gender: string) => gender.trim() === "";
 
   return (
-    <div className={cn("p-5", props.className)}>
+    <div className={cn("relative p-5", props.className)}>
+      {isProcessing === true ? (
+        <Progress
+          isIndeterminate
+          size="sm"
+          aria-label="Loading..."
+          className="sticky top-0 mb-2"
+        />
+      ) : null}
       <form
         onSubmit={handleSubmit}
         className="flex flex-col gap-3 md:grid md:grid-cols-2"
@@ -114,6 +167,7 @@ function RegistrationForm(props: { className?: string }) {
           id="name"
           placeholder="Name"
           value={formState.name}
+          disabled={isProcessing}
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
             dispatch({
               type: "field_change",
@@ -132,6 +186,7 @@ function RegistrationForm(props: { className?: string }) {
           type="email"
           placeholder="Email"
           value={formState.email}
+          disabled={isProcessing}
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
             dispatch({
               type: "field_change",
@@ -149,6 +204,7 @@ function RegistrationForm(props: { className?: string }) {
           id="website"
           placeholder="Website link"
           value={formState.website}
+          disabled={isProcessing}
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
             dispatch({
               type: "field_change",
@@ -164,12 +220,17 @@ function RegistrationForm(props: { className?: string }) {
         <Input
           id="profileImage"
           type="file"
-          value={formState.image}
+          accept="image/*"
+          // value={formState.image? o.name ?? ""}
+          // value={formState.image}
+          ref={uploadButton}
+          disabled={isProcessing}
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
             dispatch({
               type: "field_change",
-              newImage: e.target.value,
+              newImage: e.target.files ? e.target.files[0] : undefined,
             });
+            // console.log(formState.image?.name ?? "<empty>");
           }}
           // onChange={(e) => {console.log(e.target.value, e.target.files)}}
           className="mb-3 w-full md:max-w-80"
@@ -196,14 +257,14 @@ function RegistrationForm(props: { className?: string }) {
           <div className="flex flex-row items-center gap-2">
             {/* <RadioGroupItem id="male" value="M">Male</RadioGroupItem> */}
             {/* <Label htmlFor="male">Male</Label> */}
-            <Radio id="male" value="M">
+            <Radio id="male" value="M" disabled={isProcessing}>
               Male
             </Radio>
           </div>
           <div className="flex flex-row items-center gap-2">
             {/* <RadioGroupItem id="female" value="F">Female</RadioGroupItem> */}
             {/* <Label htmlFor="female">Female</Label> */}
-            <Radio id="female" value="F">
+            <Radio id="female" value="F" disabled={isProcessing}>
               Female
             </Radio>
           </div>
@@ -215,7 +276,7 @@ function RegistrationForm(props: { className?: string }) {
         <DynamicPillInput
           inputId="skills"
           className="mb-3 rounded-sm border border-gray-400"
-          value={formState.skills}          
+          value={formState.skills}
           // setParentState={(value) => {
           //   dispatch({
           //     type: "field_change",
@@ -232,7 +293,10 @@ function RegistrationForm(props: { className?: string }) {
 
         {/* <Input type="submit" className="max-w-80" /> */}
         <div className="col-span-2 mt-5 flex flex-row justify-between gap-2">
-          <ShadButton type="submit" className="w-40">
+          <ShadButton type="submit" className="w-40" disabled={isProcessing}>
+            {isProcessing === true ? (
+              <ReloadIcon className="mr-2 animate-spin" />
+            ) : null}
             Submit
           </ShadButton>
           <Button onClick={clearFields} className="w-32 rounded-md">

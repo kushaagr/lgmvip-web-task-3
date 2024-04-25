@@ -1,6 +1,6 @@
 import Dexie, { Table } from 'dexie';
 
-export interface Student {
+export interface StudentInterface {
   id?: number;
   name: string;
   email: string;
@@ -13,12 +13,12 @@ export interface Student {
 export class MySubClassedDexie extends Dexie {
   // 'students' is added by dexie when declaring the stores()
   // We just tell the typing system this is the case
-  students!: Table<Student>;
+  students!: Table<StudentInterface>;
 
   constructor() {
     super('myDatabase');
     this.version(1).stores({
-      students: '++id, name, age' // Primary key and indexed props
+      students: '++id, name, email' // Primary key and indexed props
     });
   }
 }
