@@ -6,6 +6,8 @@ export interface StudentInterface {
   email: string;
   website?: string;
   image_link?: string;
+  image_key?: string;
+  image_name?: string;
   gender: 'M' | 'F' | 'Other';
   skills: string[];
 }
