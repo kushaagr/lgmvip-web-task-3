@@ -1,7 +1,5 @@
 "use client";
 
-import Image from "next/image";
-
 import { useLiveQuery } from "dexie-react-hooks";
 import { db, StudentInterface } from "@/lib/db";
 
@@ -71,23 +69,14 @@ const mycolumns: Column[] = [
   { name: "ACTIONS", uid: "actions" },
 ];
 
-// name: string;
-// email: string;
-// website?: string;
-// image_link?: string;
-// image_key?: string;
-// image_name?: string;
-// gender: 'M' | 'F' | 'Other';
-// skills: string[];
 
 function EnrolledStudentsList(props: { className?: string }) {
   const students = useLiveQuery(() => db.students.toArray());
-  // const students = await db.students.toArray();
   // console.log(students);
 
   function handleDelete(
     e: React.MouseEvent<HTMLButtonElement>,
-    id: number | string,
+    id: number | string | undefined,
     student: StudentInterface,
   ) {
     console.log(`Deleting id: ${id}`);
@@ -162,14 +151,13 @@ function EnrolledStudentsList(props: { className?: string }) {
                         </AlertDialogTitle>
                         <AlertDialogDescription>
                           This action cannot be undone. This will permanently
-                          delete your account and remove your data from our
-                          servers.
+                          remove your data from our database.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
-                          onClick={(e) => handleDelete(e, student.id, student)}
+                          onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleDelete(e, student.id, student)}
                         >
                           Continue
                         </AlertDialogAction>

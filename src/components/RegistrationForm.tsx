@@ -106,10 +106,11 @@ export default function RegistrationForm(props: { className?: string }) {
         // alert("uploaded successfully!");
       },
       onUploadError: () => {
+        submitToDb(formState);
         setIsProcessing(false);
         toast({
-          title: "Uh oh! Something went wrong.",
-          description: "There was a problem with your request.",
+          title: "Uh oh! Image cannot be uploaded",
+          description: "Rest details submitted successfully.",
         });
         // alert("Error occurred while uploading image.");
       },
