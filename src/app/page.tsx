@@ -104,7 +104,7 @@ function EnrolledStudentsList(props: { className?: string }) {
           return (
             <div className="flex flex-row gap-2">
               <Avatar>
-                <AvatarImage src={student.image_link} alt={student.name} />
+                <AvatarImage className="object-cover" src={student.image_link} alt={student.name} />
                 <AvatarFallback>{student.name.slice(0, 2)}</AvatarFallback>
               </Avatar>
               <div className="flex flex-col">
