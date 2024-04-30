@@ -36,3 +36,11 @@ Task 3 of LetsGrowMore [task list](https://www.canva.com/design/DAEhLWUJEDM/qVR2
 - [UploadThing](https://www.uploadthing.com)
 
 ## Screenshot and Demo
+
+
+https://github.com/kushaagr/lgmvip-web-task-3/assets/68564934/98d0f32d-9a2b-433e-abc3-4506746378f5
+
+![chrome_1714452958](https://github.com/kushaagr/lgmvip-web-task-3/assets/68564934/89dff382-45c5-42da-b6b9-f6ff77f32539)
+![chrome_1714452951](https://github.com/kushaagr/lgmvip-web-task-3/assets/68564934/6c4e09bb-38d4-4c31-a1f2-68107e788230)
+![chrome_1714452939](https://github.com/kushaagr/lgmvip-web-task-3/assets/68564934/53da44cb-4e1b-4c0f-8d81-7d4d6118a6f0)
+
